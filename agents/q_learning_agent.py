@@ -6,7 +6,7 @@ class QLearningMarioAgent:
     Class representing a traditional Q-Learning Super Mario Agent.
     """
 
-    def __init__(self, actions, q_values=None, exploration_rate=0.8, learning_rate=0.6, discount=0.9, decay=0.99):
+    def __init__(self, actions, q_values=None, exploration_rate=0.8, learning_rate=0.6, discount=0.9, decay=0.99999):
         """
         Initializes the Q-Learning agent.
 

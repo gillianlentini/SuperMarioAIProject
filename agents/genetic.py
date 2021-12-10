@@ -41,8 +41,9 @@ def run_sequence(sequence, env_name):
     # env = gym_super_mario_bros.make('SuperMarioBros-v0')
     env = gym_super_mario_bros.make(env_name)
     env = JoypadSpace(env, SIMPLE_MOVEMENT)
+    env.reset()
     info = None
-    for i in range(sequence):
+    for i in range(len(sequence)):
         curr_action = sequence[i]
         state, reward, done, info = env.step(curr_action)
         if done:

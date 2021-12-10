@@ -5,8 +5,6 @@ from nes_py.wrappers import JoypadSpace
 import gym_super_mario_bros
 from agents import genetic
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
-env = gym_super_mario_bros.make('SuperMarioBros-v0')
-env = JoypadSpace(env, SIMPLE_MOVEMENT)
 
 done = True
 sequence_length = 20000
@@ -27,7 +25,7 @@ data_from_ga = []
 sequences = [[random.randint(0, len(SIMPLE_MOVEMENT) - 1) for _ in range(sequence_length)] for _ in range(number_of_sequences)]
 for i in range(generations):
     best_sequences = []
-    for j in range(sequences):
+    for j in range(len(sequences)):
         sequence = sequences[j]
         max_reached, info = genetic.run_sequence(sequence, 'SuperMarioBros-v0')
         fitness = genetic.fitness_of_sequence_all_levels(info)
