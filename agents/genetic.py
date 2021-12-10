@@ -7,7 +7,7 @@ from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
 def crossover(max_steps, number_of_crossovers, to_breed, number_of_children):
     crossover_points = [random.randint(0, max_steps) for _ in range(number_of_crossovers)]
     list.sort(crossover_points)
-    buckets = [[] * (number_of_crossovers + 1)]
+    buckets = [[]] * (number_of_crossovers + 1)
     for parent in to_breed:
         crossover_left = 0
         for i in range(number_of_crossovers):
