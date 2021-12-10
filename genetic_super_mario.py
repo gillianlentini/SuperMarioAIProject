@@ -14,7 +14,8 @@ number_to_breed = 20
 number_of_crossovers = 1
 mutation_rate = .5
 mutation_rate_decay = .95
-curr_state = env.reset()
+max_fitness_encountered = 0
+best_sequence_so_far = []
 
 # CSV INFORMATION
 fields = [
@@ -35,8 +36,12 @@ for i in range(generations):
     heapq.heapify(best_sequences)
     to_breed = []
     max_steps = 0
-    for _ in range(number_to_breed):
+    for i in range(number_to_breed):
         neg_fitness, max_reached, sequence = heapq.heappop(best_sequences)
+        if i == 0:
+            if abs(neg_fitness) > max_fitness_encountered:
+                best_sequence_so_far = sequence
+                max_fitness_encountered = max(max_fitness_encountered, abs(neg_fitness))
         max_steps = max(max_steps, max_reached)
         to_breed.append(sequence)
 
@@ -48,3 +53,7 @@ with open("ga_data.csv", "w") as csvfile:
     csvwriter = csv.writer(csvfile)
     csvwriter.writerow(fields)
     csvwriter.writerows(data_from_ga)
+
+file_best_sequence = open("best_sequence", "w")
+file_best_sequence.write(f"f{max_fitness_encountered}\n")
+file_best_sequence.write(",".join(best_sequence_so_far.str))
