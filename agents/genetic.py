@@ -48,7 +48,7 @@ def run_sequence(sequence, env_name):
         state, reward, done, info = env.step(curr_action)
         if done:
             return i, info
-    return len(sequence), info
+    return len(sequence) - 1, info
 
 
 def fitness_of_sequence_all_levels(info):
