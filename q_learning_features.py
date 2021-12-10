@@ -36,7 +36,7 @@ for i in range(episodes):
             action = q_learning_agent.get_action(curr_state_tuple)
             state, reward, done, info = env.step(action)
             next_state_tuple = tuple(info.values())
-            q_learning_agent.update_q_values(curr_state_tuple, action, next_state_tuple, reward)
+            q_learning_agent.update(curr_state_tuple, action, next_state_tuple, reward)
             curr_state_tuple = next_state_tuple
             env.render()
     q_values = q_learning_agent.get_q_values()

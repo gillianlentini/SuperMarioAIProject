@@ -30,7 +30,7 @@ for i in range(episodes):
                 break
             action = q_learning_agent.get_action(numpy.array2string(curr_state))
             next_state, reward, done, info = env.step(action)
-            q_learning_agent.update_q_values(numpy.array2string(curr_state), action, numpy.array2string(next_state), reward)
+            q_learning_agent.update(numpy.array2string(curr_state), action, numpy.array2string(next_state), reward)
             curr_state = next_state
             env.render()
     q_values = q_learning_agent.get_q_values()

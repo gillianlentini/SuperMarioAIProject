@@ -85,7 +85,7 @@ class QLearningMarioAgent:
         self.exploration_rate *= self.decay
         return action
 
-    def update_q_values(self, state, action, next_state, reward):
+    def update(self, state, action, next_state, reward):
         """
         Updates the q-value of the given state, action pair based on the
         observation of the next state reached and reward.
