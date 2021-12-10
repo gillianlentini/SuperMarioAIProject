@@ -21,7 +21,7 @@ def crossover(max_steps, number_of_crossovers, to_breed, number_of_children):
         new_sequence = []
         for bucket in buckets:
             seq_piece = random.choice(bucket)
-            new_sequence.append(seq_piece)
+            new_sequence.extend(seq_piece)
         sequences.append(new_sequence)
     return sequences
 
@@ -49,6 +49,12 @@ def run_sequence(sequence, env_name):
         if done:
             return i, info
     return len(sequence) - 1, info
+
+def run_sequence_parallel(seq, episode, seq_num):
+    max_reached, info = run_sequence(seq, 'SuperMarioBros-v0')
+    fitness = fitness_of_sequence_all_levels(info)
+    data_tuple = ([episode + 1, seq_num + 1, fitness, info["score"], info["world"], info["stage"]])
+    return -fitness, max_reached, data_tuple, seq
 
 
 def fitness_of_sequence_all_levels(info):
