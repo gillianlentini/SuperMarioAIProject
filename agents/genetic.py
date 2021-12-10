@@ -4,10 +4,13 @@ from nes_py.wrappers import JoypadSpace
 import gym_super_mario_bros
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
 
+
 def crossover(max_steps, number_of_crossovers, to_breed, number_of_children):
-    crossover_points = [random.randint(0, max_steps) for _ in range(number_of_crossovers)]
+    crossover_points = [random.randint(0, max_steps - 1) for _ in range(number_of_crossovers)]
     list.sort(crossover_points)
-    buckets = [[]] * (number_of_crossovers + 1)
+    buckets = []
+    for _ in range(number_of_crossovers + 1):
+        buckets.append([])
     for parent in to_breed:
         crossover_left = 0
         for i in range(number_of_crossovers):
@@ -32,7 +35,7 @@ def mutate(sequences, max_reached, mutation_rate):
         max_possible_mutations = int(max_reached * mutation_rate)
         number_of_mutations = random.randint(0, max_possible_mutations)
         for _ in range(number_of_mutations):
-            place_to_mutate = random.randint(0, max_reached)
+            place_to_mutate = random.randint(0, max_reached - 1)
             action = random.randint(0, len(SIMPLE_MOVEMENT) - 1)
             sequence[place_to_mutate] = action
     return sequences
