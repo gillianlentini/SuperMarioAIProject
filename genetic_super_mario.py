@@ -39,6 +39,7 @@ def run_genetic_algorithm(world, stage, generations, number_of_sequences, sequen
             genetic.run_sequence_parallel,
             args=(sequences[j], i, j, stop_when_dead, world, stage))
             for j in range(number_of_sequences)]
+        multiprocessing_pool.close()
         print(f"Finished Initial Processing for Generation: {i + 1}")
 
         data_from_ga = []
