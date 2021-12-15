@@ -47,7 +47,6 @@ for e in range(episodes):
 
     state = env.reset()
 
-    # Play the game!
     while True:
 
         action = mario.act(state)
