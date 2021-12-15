@@ -1,3 +1,14 @@
+'''
+   This code was written by following the following PyTorch tutorial
+   Tutorial Title: TRAIN A MARIO-PLAYING RL AGENT
+   Project Title: MadMario
+   Author: Yuansong Feng, Suraj Subramanian, Howard Wang, Steven Guo
+   Date: June 2020
+   Code version: 2.0
+   Availability: https://pytorch.org/tutorials/intermediate/mario_rl_tutorial.html#train-a-mario-playing-rl-agent
+                 https://github.com/YuansongFeng/MadMario
+'''
+
 import gym
 import torch
 import random, datetime, numpy as np
@@ -18,7 +29,6 @@ class ResizeObservation(gym.ObservationWrapper):
 
     def observation(self, observation):
         resize_obs = transform.resize(observation, self.shape)
-        # cast float back to uint8
         resize_obs *= 255
         resize_obs = resize_obs.astype(np.uint8)
         return resize_obs
@@ -26,12 +36,10 @@ class ResizeObservation(gym.ObservationWrapper):
 
 class SkipFrame(gym.Wrapper):
     def __init__(self, env, skip):
-        """Return only every `skip`-th frame"""
         super().__init__(env)
         self._skip = skip
 
     def step(self, action):
-        """Repeat action, and sum reward"""
         total_reward = 0.0
         done = False
         for i in range(self._skip):
