@@ -1,3 +1,14 @@
+'''
+   This code was written by following the following PyTorch tutorial
+   Tutorial Title: TRAIN A MARIO-PLAYING RL AGENT
+   Project Title: MadMario
+   Author: Yuansong Feng, Suraj Subramanian, Howard Wang, Steven Guo
+   Date: June 2020
+   Code version: 2.0
+   Availability: https://pytorch.org/tutorials/intermediate/mario_rl_tutorial.html#train-a-mario-playing-rl-agent
+                 https://github.com/YuansongFeng/MadMario
+'''
+
 from collections import deque
 import random
 
@@ -13,61 +24,43 @@ class DeepQLearningMario:
         self.action_dim = action_dim
         self.save_dir = save_dir
 
-        self.use_cuda = torch.cuda.is_available()
-
-        # Mario's DNN to predict the most optimal action - we implement this in the Learn section
         self.net = MarioNet(self.state_dim, self.action_dim).float()
-        if self.use_cuda:
-            self.net = self.net.to(device='cuda')
 
         self.exploration_rate = 1
-        self.exploration_rate_decay = 0.99999975
+        self.exploration_rate_decay = 0.999999
         self.exploration_rate_min = 0.1
         self.curr_step = 0
 
-        self.save_every = 5e5  # no. of experiences between saving Mario Net
+        self.save_every = 5e5 
         self.memory = deque(maxlen=100000)
         self.batch_size = 32
         self.gamma = 0.9
         self.optimizer = torch.optim.Adam(self.net.parameters(), lr=0.00025)
         self.loss_fn = torch.nn.SmoothL1Loss()
 
-        self.burnin = 1e5  # min. experiences before training
-        self.learn_every = 3  # no. of experiences between updates to Q_online
-        self.sync_every = 1e4  # no. of experiences between Q_target & Q_online sync
+        self.burnin = 1e5 
+        self.learn_every = 3 
+        self.sync_every = 1e4 
 
 
     def act(self, state):
-        """
-            Given a state, choose an epsilon-greedy action and update value of step.
-
-            Inputs:
-            state(LazyFrame): A single observation of the current state, dimension is (state_dim)
-            Outputs:
-            action_idx (int): An integer representing which action Mario will perform
-            """
-        # EXPLORE
         if np.random.rand() < self.exploration_rate:
             action_idx = np.random.randint(self.action_dim)
 
-        # EXPLOIT
         else:
             state = torch.FloatTensor(state).cuda() if self.use_cuda else torch.FloatTensor(state)
             state = state.unsqueeze(0)
             action_values = self.net(state, model='online')
             action_idx = torch.argmax(action_values, axis=1).item()
 
-        # decrease exploration_rate
         self.exploration_rate *= self.exploration_rate_decay
         self.exploration_rate = max(self.exploration_rate_min, self.exploration_rate)
 
-        # increment step
         self.curr_step += 1
         return action_idx
 
 
     def cache(self, state, next_state, action, reward, done):
-        """Add the experience to memory"""
         state = torch.FloatTensor(state).cuda() if self.use_cuda else torch.FloatTensor(state)
         next_state = torch.FloatTensor(next_state).cuda() if self.use_cuda else torch.FloatTensor(next_state)
         action = torch.LongTensor([action]).cuda() if self.use_cuda else torch.LongTensor([action])
@@ -78,16 +71,13 @@ class DeepQLearningMario:
 
 
     def recall(self):
-        """
-        Retrieve a batch of experiences from memory
-        """
         batch = random.sample(self.memory, self.batch_size)
         state, next_state, action, reward, done = map(torch.stack, zip(*batch))
         return state, next_state, action.squeeze(), reward.squeeze(), done.squeeze()
 
 
     def td_estimate(self, state, action):
-        current_Q = self.net(state, model='online')[np.arange(0, self.batch_size), action]  # Q_online(s,a)
+        current_Q = self.net(state, model='online')[np.arange(0, self.batch_size), action]
         return current_Q
 
 
@@ -134,16 +124,12 @@ class DeepQLearningMario:
         if self.curr_step % self.learn_every != 0:
             return None, None
 
-        # Sample from memory
         state, next_state, action, reward, done = self.recall()
-
-        # Get TD Estimate
+        
         td_est = self.td_estimate(state, action)
-
-        # Get TD Target
+        
         td_tgt = self.td_target(reward, next_state, done)
 
-        # Backpropagate loss through Q_online
         loss = self.update_Q_online(td_est, td_tgt)
 
         return (td_est.mean().item(), loss)
