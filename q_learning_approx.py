@@ -4,25 +4,24 @@ Q-Learning Algorithm where the representation of state is an abstract list of fe
 import csv
 from nes_py.wrappers import JoypadSpace
 import gym_super_mario_bros
-from agents.q_learning_agent import QLearningMarioAgent
+from agents.approximate_q_learning_agent import ApproxQLearningMarioAgent
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
 
-env = gym_super_mario_bros.make("SuperMarioBros-v0")
+env = gym_super_mario_bros.make("SuperMarioBros-v3")
 env = JoypadSpace(env, SIMPLE_MOVEMENT)
 
 done = False
 episodes = 100
 games_per_episode = 20
-info = {}
-curr_state_tuple = (0, False, 3, 0, 1, "small", 400, 1, 40, 79)
-q_values = None
+info = {"coins": 0, "flag_get": False, "life":3, "score":0, "stage": 1, "status": "small","time": 400, "world": 1, "x_pos":40, "y_pos": 79}
+weights = None
 data_from_training = []
 fields = ["Episode", "Game", "Coins", "Score", "World", "Level", "Time"]
 
 env.reset()
 for i in range(episodes):
     print(f"CURRENT EPISODE: {i+1}")
-    q_learning_agent = QLearningMarioAgent(len(SIMPLE_MOVEMENT), q_values=q_values)
+    q_learning_agent = ApproxQLearningMarioAgent(len(SIMPLE_MOVEMENT), weights=weights)
     for j in range(games_per_episode):
         print(f"game:{j+1}")
         while True:
@@ -38,22 +37,23 @@ for i in range(episodes):
                         info["time"],
                     ]
                 )
-                curr_state_tuple = (0, False, 3, 0, 1, "small", 400, 1, 40, 79)
                 env.reset()
+                info = {"coins": 0, "flag_get": False, "life": 3, "score": 0, "stage": 1, "status": "small",
+                        "time": 400, "world": 1, "x_pos": 40, "y_pos": 79}
                 done = False
                 break
 
-            action = q_learning_agent.get_action(curr_state_tuple)
-            state, reward, done, info = env.step(action)
-            next_state_tuple = tuple(info.values())
-            q_learning_agent.update(curr_state_tuple, action, next_state_tuple, reward)
-            curr_state_tuple = next_state_tuple
+            action = q_learning_agent.get_action(info)
+            state, reward, done, next_info = env.step(action)
+            env.compute_reward()
+            q_learning_agent.update(info, action, next_info, reward)
+            info = next_info
     q_values = q_learning_agent.get_q_values()
 
-with open("data/q_learning_features.csv", "w") as csvfile:
+with open("data/q_learning_approx.csv", "w") as csvfile:
     csvwriter = csv.writer(csvfile)
     csvwriter.writerow(fields)
     csvwriter.writerows(data_from_training)
 
-file_best_sequence = open("data/features_policy", "w")
+file_best_sequence = open("data/approx_policy", "w")
 file_best_sequence.write(f"f{q_values}\n")

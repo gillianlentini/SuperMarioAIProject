@@ -1,1 +1,7 @@
+gym-super-mario-bros
+opencv-python
+argparse
+multiprocessing
 torch
+matplotlib
+scikit-learn

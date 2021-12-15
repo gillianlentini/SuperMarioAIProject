@@ -1,13 +1,28 @@
+"""
+Script for running Genetic Algorithm based on Sequences. Random sequences of moves are created, evaluated for fitness,
+sorted by fitness level, and then allowed to "breed."
+"""
 import argparse
 import heapq
 import multiprocessing
-from agents import genetic
-from file_utils import add_csv_rows, create_csv_file, overwrite_seq_file
+from agents import genetic_sequence_agent
+from util.file_utils import add_csv_rows, create_csv_file, overwrite_seq_file
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
 
 
-def run_genetic_algorithm(world, stage, generations, number_of_sequences, sequence_length, number_to_breed,
-                          number_of_crossovers, mutation_rate, mutation_rate_decay, csv_file_name, seq_file_name):
+def run_genetic_algorithm(
+    world,
+    stage,
+    generations,
+    number_of_sequences,
+    sequence_length,
+    number_to_breed,
+    number_of_crossovers,
+    mutation_rate,
+    mutation_rate_decay,
+    csv_file_name,
+    seq_file_name,
+):
     """
     Runs the genetic Algorithm
 
@@ -24,10 +39,20 @@ def run_genetic_algorithm(world, stage, generations, number_of_sequences, sequen
     :param seq_file_name: text file to output best sequence to
     :return:
     """
-    fields = ["Generation", "Sequence", "Fitness", "Score", "World", "Stage", "X Position"]
+    fields = [
+        "Generation",
+        "Sequence",
+        "Fitness",
+        "Score",
+        "World",
+        "Stage",
+        "X Position",
+    ]
     create_csv_file(fields, csv_file_name)
     # initial sequences are random moves
-    sequences = genetic.get_initial_sequences(sequence_length, number_of_sequences, len(SIMPLE_MOVEMENT))
+    sequences = genetic_sequence_agent.get_initial_sequences(
+        sequence_length, number_of_sequences, len(SIMPLE_MOVEMENT)
+    )
     max_fitness_encountered = 0
 
     for i in range(generations):
@@ -35,10 +60,13 @@ def run_genetic_algorithm(world, stage, generations, number_of_sequences, sequen
 
         # run each member of the generation
         multiprocessing_pool = multiprocessing.Pool()
-        best_sequences = [multiprocessing_pool.apply(
-            genetic.run_sequence_parallel,
-            args=(sequences[j], i, j, stop_when_dead, world, stage))
-            for j in range(number_of_sequences)]
+        best_sequences = [
+            multiprocessing_pool.apply(
+                genetic_sequence_agent.run_sequence_parallel,
+                args=(sequences[j], i, j, stop_when_dead, world, stage),
+            )
+            for j in range(number_of_sequences)
+        ]
         multiprocessing_pool.close()
         print(f"Finished Initial Processing for Generation: {i + 1}")
 
@@ -59,22 +87,26 @@ def run_genetic_algorithm(world, stage, generations, number_of_sequences, sequen
             if seq_num == 0:
                 # if this is the best so far we want to save this!
                 if abs(neg_fitness) > max_fitness_encountered:
-                    max_fitness_encountered = max(max_fitness_encountered, abs(neg_fitness))
-                    overwrite_seq_file(sequence, i+1, seq_file_name)
+                    max_fitness_encountered = max(
+                        max_fitness_encountered, abs(neg_fitness)
+                    )
+                    overwrite_seq_file(sequence, i + 1, seq_file_name)
             max_steps = max(max_steps, max_reached)
             to_breed.append(sequence)
 
         # crossover
         print(f"Crossover for Generation: {i + 1}")
-        sequences = genetic.crossover(max_steps, number_of_crossovers, to_breed, number_of_sequences)
+        sequences = genetic_sequence_agent.crossover(
+            max_steps, number_of_crossovers, to_breed, number_of_sequences
+        )
         # mutate, and decrement mutation rate
         print(f"Mutations for Generation: {i + 1}")
-        sequences = genetic.mutate(sequences, max_steps, mutation_rate)
+        sequences = genetic_sequence_agent.mutate(sequences, max_steps, mutation_rate)
         mutation_rate *= mutation_rate_decay
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Genetic Algo for SMB.')
+    parser = argparse.ArgumentParser(description="Genetic Algo for SMB.")
     parser.add_argument("--num_seq", required=True, type=int)
     parser.add_argument("--generations", required=True, type=int)
     parser.add_argument("--world", default=False, type=int)
@@ -93,11 +125,22 @@ if __name__ == "__main__":
         csv_file_name = f"ga_data_{world}_{stage}.csv"
         seq_file_name = f"best_seq_{world}_{stage}.txt"
 
-    number_to_breed = max(2, int(number_of_sequences * .1))
+    number_to_breed = max(2, int(number_of_sequences * 0.1))
     number_of_crossovers = 1
-    mutation_rate = .2
-    mutation_rate_decay = .9
+    mutation_rate = 0.4
+    mutation_rate_decay = 0.95
     stop_when_dead = True
 
-    run_genetic_algorithm(world, stage, generations, number_of_sequences, sequence_length, number_to_breed,
-                          number_of_crossovers, mutation_rate, mutation_rate_decay, csv_file_name, seq_file_name)
+    run_genetic_algorithm(
+        world,
+        stage,
+        generations,
+        number_of_sequences,
+        sequence_length,
+        number_to_breed,
+        number_of_crossovers,
+        mutation_rate,
+        mutation_rate_decay,
+        csv_file_name,
+        seq_file_name,
+    )

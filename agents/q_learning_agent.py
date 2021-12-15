@@ -6,7 +6,15 @@ class QLearningMarioAgent:
     Class representing a traditional Q-Learning Super Mario Agent.
     """
 
-    def __init__(self, actions, q_values=None, exploration_rate=0.8, learning_rate=0.6, discount=0.9, decay=0.99999):
+    def __init__(
+        self,
+        actions,
+        q_values=None,
+        exploration_rate=0.8,
+        learning_rate=0.6,
+        discount=0.9,
+        decay=0.99999,
+    ):
         """
         Initializes the Q-Learning agent.
 
@@ -63,7 +71,9 @@ class QLearningMarioAgent:
         """
         potential_actions = []
         for action in range(self.actions):
-            if self.get_q_value(state, action) == self.compute_value_from_q_value(state):
+            if self.get_q_value(state, action) == self.compute_value_from_q_value(
+                state
+            ):
                 potential_actions.append(action)
         if not potential_actions:
             return None
@@ -96,5 +106,6 @@ class QLearningMarioAgent:
         :param reward: the reward that was gained
         """
         sample = reward + (self.discount * self.compute_value_from_q_value(next_state))
-        self.q_values[(state, action)] = ((1 - self.learning_rate) * self.get_q_value(state, action)) \
-                                         + (self.learning_rate * sample)
+        self.q_values[(state, action)] = (
+            (1 - self.learning_rate) * self.get_q_value(state, action)
+        ) + (self.learning_rate * sample)

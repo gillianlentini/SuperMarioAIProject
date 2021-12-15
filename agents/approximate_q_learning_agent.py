@@ -4,47 +4,62 @@ from agents.q_learning_agent import QLearningMarioAgent
 
 
 class ApproxQLearningMarioAgent(QLearningMarioAgent):
-
-    def __init__(self, actions, weights=None, exploration_rate=0.8, learning_rate=0.6, discount=0.9, decay=0.99):
-        super().__init__(actions, exploration_rate=exploration_rate, learning_rate=learning_rate, discount=discount, decay=decay)
+    def __init__(
+        self,
+        actions,
+        weights=None,
+        exploration_rate=0.8,
+        learning_rate=0.6,
+        discount=0.9,
+        decay=0.99,
+    ):
+        super().__init__(
+            actions,
+            exploration_rate=exploration_rate,
+            learning_rate=learning_rate,
+            discount=discount,
+            decay=decay,
+        )
+        self.status_map = {"small": 1, "tall": 2, "fireball": 3}
         if weights:
             self.weights = weights
         else:
             # if not given, initialize empty dictionary
-            self.weights = {"coins": 0.0,
-                            "flag_get": 0.0,
-                            "life": 0.0,
-                            "score": 0.0,
-                            "stage": 0.0,
-                            "status": 0.0,
-                            "time": 0.0,
-                            "world": 0.0,
-                            "x_pos": 0.0,
-                            "y_pos": 0.0,
-                            }
+            self.weights = {
+                "status": 0.0,
+                "time": 0.0,
+                "x_pos": 0.0,
+                "y_pos": 0.0,
+            }
 
     def get_weights(self):
         return self.weights
 
     def get_q_value(self, state, action):
-        """
-
-        """
         q_value = 0
-        for key, value in state:
+        for key in self.weights.keys():
+            if key == "status":
+                value = self.status_map[state[key]]
+            else:
+                value = state[key]
+
             q_value += self.weights[key] * value
 
         return q_value
 
     def update(self, state, action, next_state, reward):
-        difference = reward + self.discount * self.compute_value_from_q_value(next_state) - self.get_q_value(state, action)
+        difference = (
+            reward
+            + self.discount * self.compute_value_from_q_value(next_state)
+            - self.get_q_value(state, action)
+        )
 
-        # features_vect = self.featExtractor.getFeatures(state, action)
-        for feature, value in state.items():
+        for feature in self.weights.keys():
+            if feature == "status":
+                value = self.status_map[state[feature]]
+            else:
+                value = state[feature]
             self.weights[feature] += self.learning_rate * difference * value
-
-
-
 
     def get_q_values(self):
         """

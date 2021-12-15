@@ -16,7 +16,9 @@ def crossover(max_steps, number_of_crossovers, to_breed, number_of_children):
     :param number_of_children: Number of children to make
     :return: Children sequences of len(number_of_children)
     """
-    crossover_points = [random.randint(0, max_steps - 1) for _ in range(number_of_crossovers)]
+    crossover_points = [
+        random.randint(0, max_steps - 1) for _ in range(number_of_crossovers)
+    ]
     list.sort(crossover_points)
     buckets = []
     for _ in range(number_of_crossovers + 1):
@@ -94,15 +96,23 @@ def run_sequence_parallel(seq, episode, seq_num, stop_when_dead, world, stage):
     :return: -fitness, max reached step, data on run, sequence
     """
     if world and stage:
-        stage_name = f'SuperMarioBros-{world}-{stage}-v3'
+        stage_name = f"SuperMarioBros-{world}-{stage}-v3"
     else:
-        stage_name = 'SuperMarioBros-v3'
+        stage_name = "SuperMarioBros-v3"
     max_reached, info = run_sequence(seq, stage_name, stop_when_dead)
     if world and stage:
         fitness = fitness_of_sequence_one_level(info)
     else:
         fitness = fitness_of_sequence_all_levels(info)
-    data = ([episode + 1, seq_num + 1, fitness, info["score"], info["world"], info["stage"], info["x_pos"]])
+    data = [
+        episode + 1,
+        seq_num + 1,
+        fitness,
+        info["score"],
+        info["world"],
+        info["stage"],
+        info["x_pos"],
+    ]
     return -fitness, max_reached, data, seq
 
 
@@ -117,17 +127,15 @@ def fitness_of_sequence_all_levels(info):
     """
     # max_score_ever = 1435100
     score = info["score"]
-    coins = info["coins"]
-    stage = info["stage"] # 1-4
-    world = info["world"] # 1-8
+    stage = info["stage"]  # 1-4
+    world = info["world"]  # 1-8
     x_pos = info["x_pos"]
     level_factor = 10 * world + stage
     if info["flag_get"]:
         level_factor = 100
-    score_level_factor = level_factor * (score/100)
-    right_bias = x_pos * 5
-    coins_bias = coins * 10
-    return score_level_factor + right_bias + coins_bias
+    score_level_factor = level_factor * (score / 100)
+    right_bias = x_pos * 10
+    return score_level_factor + right_bias
 
 
 def fitness_of_sequence_one_level(info):
@@ -138,9 +146,8 @@ def fitness_of_sequence_one_level(info):
     :return: Fitness of sequence
     """
     score = info["score"]
-    coins = info["coins"]
     x_pos = info["x_pos"]
-    return x_pos * 5 + (score / 10) + (coins * 10)
+    return x_pos * 10 + score
 
 
 def get_initial_sequences(sequence_length, num_sequences, number_actions):
@@ -152,4 +159,7 @@ def get_initial_sequences(sequence_length, num_sequences, number_actions):
     :param number_actions: Number of action that are possible
     :return: Randomized list of sequences
     """
-    return [[random.randint(0, number_actions - 1) for _ in range(sequence_length)] for _ in range(num_sequences)]
+    return [
+        [random.randint(0, number_actions - 1) for _ in range(sequence_length)]
+        for _ in range(num_sequences)
+    ]
