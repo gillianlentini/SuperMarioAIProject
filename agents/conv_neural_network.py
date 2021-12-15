@@ -1,12 +1,20 @@
+'''
+   This code was written by following the following PyTorch tutorial
+   Tutorial Title: TRAIN A MARIO-PLAYING RL AGENT
+   Project Title: MadMario
+   Author: Yuansong Feng, Suraj Subramanian, Howard Wang, Steven Guo
+   Date: June 2020
+   Code version: 2.0
+   Availability: https://pytorch.org/tutorials/intermediate/mario_rl_tutorial.html#train-a-mario-playing-rl-agent
+                 https://github.com/YuansongFeng/MadMario
+'''
+
 import copy
 
 import torch.nn as nn
 
 
 class MarioNet(nn.Module):
-    '''mini cnn structure
-    input -> (conv2d + relu) x 3 -> flatten -> (dense + relu) x 2 -> output
-    '''
 
     def __init__(self, input_dim, output_dim):
         super().__init__()
@@ -31,8 +39,6 @@ class MarioNet(nn.Module):
         )
 
         self.target = copy.deepcopy(self.online)
-
-        # Q_target parameters are frozen.
         for p in self.target.parameters():
             p.requires_grad = False
 
