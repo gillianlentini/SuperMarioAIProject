@@ -1,3 +1,14 @@
+'''
+   This code was written by following the following PyTorch tutorial
+   Tutorial Title: TRAIN A MARIO-PLAYING RL AGENT
+   Project Title: MadMario
+   Author: Yuansong Feng, Suraj Subramanian, Howard Wang, Steven Guo
+   Date: June 2020
+   Code version: 2.0
+   Availability: https://pytorch.org/tutorials/intermediate/mario_rl_tutorial.html#train-a-mario-playing-rl-agent
+                 https://github.com/YuansongFeng/MadMario
+'''
+
 from IPython.display import HTML
 from IPython import display as ipythondisplay
 import glob
