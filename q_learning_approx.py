@@ -45,7 +45,6 @@ for i in range(episodes):
 
             action = q_learning_agent.get_action(info)
             state, reward, done, next_info = env.step(action)
-            env.compute_reward()
             q_learning_agent.update(info, action, next_info, reward)
             info = next_info
     q_values = q_learning_agent.get_q_values()
